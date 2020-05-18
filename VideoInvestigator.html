@@ -1,0 +1,1655 @@
+<!-- All Rights Reserved Christopher Topalian Copyright 2020  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title> VideoInvestigator </title>
+<meta charset="UTF-8">
+<script src="record.js"></script>
+
+<script>
+let records = [];
+
+let StartTimeEntered;
+let EndTimeEntered;
+
+let NotesEntered;
+let WordsEntered;
+let ConclusionEntered;
+
+let theHtmlAddRecordWithTable;
+
+let theTotalStartMinutes;
+let theTotalEndMinutes;
+
+let idOfRecord;
+let recordEntry;
+let theIdHere;
+
+let nameOfVideo = "movie.mp4";
+let nameOfRecords = "record.js";
+
+function loadFunctions()
+{
+	videoInit("video1", 1, 2);
+	loadRecord();
+	
+	window.addEventListener("keydown", whichKeyPressed, false);
+	
+	document.getElementById("continueButton").addEventListener("click", continueVideo, false);
+
+	document.getElementById("decreaseItStartButton").addEventListener("click", decreaseItStart, false);
+
+	document.getElementById("increaseItStartButton").addEventListener("click", increaseItStart, false);
+
+	document.getElementById("decreaseItEndButton").addEventListener("click", decreaseItEnd, false);
+
+	document.getElementById("increaseItEndButton").addEventListener("click", increaseItEnd, false);
+
+	document.getElementById("startInput").addEventListener("change", setStartTime, false);
+
+	document.getElementById("endInput").addEventListener("change", setEndTime, false);
+
+	document.getElementById("noteInput").addEventListener("keyup", setNote, false);
+
+	document.getElementById("wordsInput").addEventListener("keyup", setWords, false);
+
+	document.getElementById("conclusionInput").addEventListener("keyup", setConclusion, false);
+
+	document.getElementById("clearTextButton").addEventListener("click", clearText, false);
+
+	document.getElementById("addRecordButton").addEventListener("click", addRecord, false);
+
+	document.getElementById("fullReportNewWindowButton").addEventListener("click", fullReportCodeNewWindow, false);
+
+	document.getElementById("fullReportCodeButton").addEventListener("click", fullReportCode, false);
+
+	document.getElementById("clearAllRecordsButton").addEventListener("click", clearAllRecords, false);
+
+	document.getElementById("deleteThisRecordButton").addEventListener("click", deleteThisRecord, false);
+
+	document.getElementById("showReverseOrderButton").addEventListener("click", showReverseOrder, false);
+
+	//document.getElementById("continueButton").addEventListener("click", continueVideo, false);
+
+	document.getElementById("xxlSIZEButton").addEventListener("click", function(){ setVideoSize(1300)}, false);
+
+	document.getElementById("xlSIZEButton").addEventListener("click", function(){ setVideoSize(1000)}, false);
+
+	document.getElementById("lSIZEButton").addEventListener("click", function(){ setVideoSize(800)}, false);
+
+	document.getElementById("mSIZEButton").addEventListener("click", function(){ setVideoSize(600)}, false);
+		
+	document.getElementById("sSIZEButton").addEventListener("click", function(){ setVideoSize(480)}, false);
+
+	document.getElementById("volume100Button").addEventListener("click", function(){ setVolume(1.0)}, false);
+
+	document.getElementById("volume50Button").addEventListener("click", function(){ setVolume(0.5)}, false);
+
+	document.getElementById("volume25Button").addEventListener("click", function(){ setVolume(0.25)}, false);
+
+	document.getElementById("volume15Button").addEventListener("click", function(){ setVolume(0.15)}, false);
+
+	document.getElementById("volume5Button").addEventListener("click", function(){ setVolume(0.05)}, false);
+
+	document.getElementById("volume0Button").addEventListener("click", function(){ setVolume(0.0)}, false);
+
+	document.getElementById("jsonDownloadButton").addEventListener("click", jsonDownload, false);
+
+	document.getElementById("markStartVideoButton").addEventListener("click", markStartVideo, false);
+
+	document.getElementById("markEndVideoButton").addEventListener("click", markEndVideo, false);
+
+	document.getElementById("playVideo100Button").addEventListener("click", function(){ playVideoMAIN(StartTimeEntered, EndTimeEntered, 'video1', 1.0 )}, false);
+
+	document.getElementById("playVideo50Button").addEventListener("click", function(){ playVideoMAIN(StartTimeEntered, EndTimeEntered, 'video1', 0.5 )}, false);
+
+	document.getElementById("playVideo25Button").addEventListener("click", function(){ playVideoMAIN(StartTimeEntered, EndTimeEntered, 'video1', 0.25 )}, false);
+
+	document.getElementById("back2SecondsButton100").addEventListener("click", function(){ back2Seconds(StartTimeEntered, EndTimeEntered, 'video1', 1.0 )}, false);
+
+	document.getElementById("back2SecondsButton50").addEventListener("click", function(){ back2Seconds(StartTimeEntered, EndTimeEntered, 'video1', 0.5 )}, false);
+
+	document.getElementById("forward2SecondsButton100").addEventListener("click", function(){ forward2Seconds(StartTimeEntered, EndTimeEntered, 'video1', 1.0 )}, false);
+
+	document.getElementById("forward2SecondsButton50").addEventListener("click", function(){ forward2Seconds(StartTimeEntered, EndTimeEntered, 'video1', 0.5 )}, false);
+
+	//document.getElementById("myNewWindowButton").addEventListener("click", function(){myNewWindow(records)}, false);
+
+	fullReportCode();
+	printRecords();
+	defaultNameOfVideo(nameOfVideo);
+	defaultNameOfRecords();
+}
+
+function loadRecord()
+{
+	var script = document.createElement('script');
+	script.onload = function() {
+  	printRecords();
+	};
+	script.src = nameOfRecords;
+	document.getElementsByTagName('head')[0].appendChild(script);
+}
+
+function defaultNameOfVideo(){
+	nameOfVideo = "movie.mp4";
+	video1.src = nameOfVideo;
+	video1.load();
+}
+
+function jsonDownload()
+{
+	//let object = window.records;
+	let object = records;
+	let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent('records='+ JSON.stringify(object)+';');
+
+	let dlAnchorElem = document.getElementById('downloadAnchorElem');
+	dlAnchorElem.setAttribute("href",dataStr);
+	dlAnchorElem.setAttribute("download", "records.js");
+	dlAnchorElem.click();
+}
+
+
+function continueVideo()
+{
+	EndTimeEntered = 2000000;
+	document.getElementById("continueButton").style.backgroundColor="rgb(255,255,255)";
+
+	document.getElementById("continueButton").innerText="Plays to End";
+}
+
+function setNote()
+{
+	NotesEntered=document.getElementById('noteInput').value;
+	document.getElementById("displayNote").textContent = NotesEntered;
+	return NotesEntered;
+}
+
+function setWords()
+{
+	WordsEntered=document.getElementById('wordsInput').value;
+	document.getElementById("displayWords").textContent = WordsEntered;
+	return WordsEntered;
+}
+
+function setConclusion()
+{
+	ConclusionEntered=document.getElementById('conclusionInput').value;
+	document.getElementById("displayConclusion").textContent = ConclusionEntered;
+	return ConclusionEntered;
+}
+
+function whichKeyPressed(event)
+{
+	if(event.keyCode === 112)  //F1 Key
+	{
+		alert("VideoInvestigator v1.2");
+	}
+	else if(event.keyCode === 27) //Escape Key
+	{
+		//setVolume(0.0);
+		//alert("Volume Muted");
+	}
+	else if(event.keyCode === 220) //\ is 220, 16 con, 17 shift, 70 f
+	{
+		//playVideo(StartTimeEntered, EndTimeEntered, 'video1', 1.0 );
+	}
+	else if(event.keyCode === 192)  //`~ 192,  71 g key
+	{
+		//playVideoLoop(StartTimeEntered, EndTimeEntered, 'video1', 1.0 );
+	}
+	else if(event.keyCode === 61)  //= 61 , 87 W, 38 up arrow key
+	{
+		//increaseItStart();
+	}
+	else if(event.keyCode === 173)  //- 173, 83 S,  40 down arrow key
+	{
+		//decreaseItStart();
+	}
+	else if(event.keyCode === 219)  //[ is 219, 65 A,   37 left arrow key
+	{
+		//decreaseItEnd();
+	}
+	//] is 221,  68 D,   39 right arrow key
+	else if(event.keyCode === 221)  
+	{
+		//increaseItEnd();
+	}
+	/*
+	else if(event.keyCode === 32)  //32 spacebar
+	{
+		//let theVideo = document.getElementById("video1");
+		EndTimeEntered = 2000000;
+		document.getElementById("continueButton").style.backgroundColor="rgb(255,255,255)";
+		//quickPause();
+	}
+	*/
+}
+
+function clearText()
+{
+	let warningDelete = confirm("CLEAR ALL TEXT?");
+
+	if (warningDelete == true)
+	{
+		document.getElementById('startInput').value = "00:00:00";
+		document.getElementById('endInput').value = "00:00:00";
+
+		document.getElementById('theStartMinutes2').innerHTML = "00:00:00";
+		document.getElementById('theEndMinutes2').innerHTML = "00:00:00";
+
+		document.getElementById('noteInput').value = "";
+		document.getElementById('wordsInput').value = "";
+		document.getElementById('conclusionInput').value = "";
+
+		document.getElementById('displayNote').innerHTML = "Notes";
+		document.getElementById('displayWords').innerHTML = "Words";
+		document.getElementById('displayConclusion').innerHTML = "Conclusion";
+	}
+	else if(warningDelete == false)
+	{
+		alert("Canceled");
+		return;
+	}
+}
+
+function defaultNameOfRecords()
+{
+	nameOfRecords = "record.js";
+}
+
+function showReverseOrder()
+{
+	records.reverse();
+	printRecords();
+	console.log("records=" + JSON.stringify(records) + ";");
+}
+
+function howManyRecords()
+{
+	let currentLength = records.length;
+	document.getElementById('displayCount').innerHTML = currentLength;
+}
+
+function clearAllRecords()
+{
+	let warningDelete = confirm("CLEAR ALL RECORDS?");
+
+	if (warningDelete == true)
+	{
+		//printRecords();
+		//alert("Okay");
+	}
+	else if(warningDelete == false)
+	{
+		alert("Canceled");
+		return;
+	}
+
+	records = []; //clears all records
+	idOfRecord = 0;
+
+	printRecords();
+	howManyRecords();
+	console.log("records=" + JSON.stringify(records) + ";");
+}
+
+function editThisRecord(i)
+{
+	StartTimeEntered = secondsFromTimeCode(document.getElementById(i+'-startMins').value);
+  	EndTimeEntered = secondsFromTimeCode(document.getElementById(i+'-endMins').value);
+
+	theTotalStartMinutes = document.getElementById(i+'-startMins').value;
+	theTotalEndMinutes = document.getElementById(i+'-endMins').value;
+
+	NotesEntered = document.getElementById(i+'-notes').value;
+	WordsEntered = document.getElementById(i+'-words').value;
+	ConclusionEntered = document.getElementById(i+'-conclusion').value;
+
+	let existingId = records[i].recordId;
+
+	recordEntry =
+	{
+		//recordId: i,
+		recordId: existingId,
+		start: StartTimeEntered,
+		end: EndTimeEntered,
+		startMins: theTotalStartMinutes,
+		endMins: theTotalEndMinutes,
+		note: NotesEntered,
+		words: WordsEntered,
+		conclusion: ConclusionEntered
+	};
+
+	records.splice(i,1,recordEntry);
+
+	//console.log("records= " + JSON.stringify(records) + ";");
+	console.log("records= " + JSON.stringify(records) + ";");
+
+	printRecords();
+}
+
+function deleteThisRecord(i)
+{
+	let warningDelete = confirm("DELETE ONLY This Record?");
+
+	if (warningDelete == true)
+	{
+		//alert("Okay");
+	}
+	else if(warningDelete == false)
+	{
+		alert("Canceled");
+		return;
+	}
+
+	let recordEnteredToDelete = document.getElementById("deleteRecordInput").value;
+	console.log(recordEnteredToDelete + " the entered record to delete");
+
+	document.getElementById('displayDeletedRecord').innerHTML = recordEnteredToDelete;
+
+	records.splice(recordEnteredToDelete,1);
+
+	printRecords();
+	console.log("records=" + JSON.stringify(records) + ";");
+}
+
+function keepOnlyThisRecordButton(i)
+{
+	let warningKeep = confirm("Keep ONLY This Record?");
+
+	if (warningKeep == true)
+	{
+		//alert("Okay");
+	}
+	else if(warningKeep == false)
+	{
+		alert("Canceled");
+		return;
+	}
+
+	console.log("Keeping Only Record " + i);
+	records = records.splice(i,1);
+
+	printRecords();
+	console.log("records=" + JSON.stringify(records) + ";");
+}
+
+function deleteThisRecordButton(i)
+{
+	let warningDelete = confirm("DELETE ONLY This Record?");
+
+	if (warningDelete == true)
+	{
+		//alert("Okay");
+	}
+	else if(warningDelete == false)
+	{
+		alert("Canceled");
+		return;
+	}
+
+	records.splice(i,1);
+
+	printRecords();
+
+	console.log("records=" + JSON.stringify(records) + ";");
+}
+
+function moveRecordDown(i)
+{
+	let newplace = i + 1;
+	let oldplace = i;
+
+	records.splice(newplace, 0, records.splice(oldplace, 1)[0]);
+
+	printRecords();
+	console.log("records=" + JSON.stringify(records) + ";");
+}
+
+function moveRecordUp(i)
+{
+	let newplace = i - 1;
+	let oldplace = i;
+
+	records.splice(newplace, 0, records.splice(oldplace, 1)[0]);
+
+	printRecords();
+	console.log("records=" + JSON.stringify(records) + ";");
+}
+
+function findRecordIndex(someEntriesArray, theRecordIdToFind)
+{
+	let found = false;
+	for (let i = 0; i < someEntriesArray.length; i++)
+	{
+		if(someEntriesArray[i].recordId == theRecordIdToFind)
+		{
+			found = i;
+		}
+	}
+	//return i;
+	return found;
+}
+
+function calculateStartMin()
+{
+	let theInput = secondsFromTimeCode(document.getElementById('startInput').value);
+	  
+	let startFullTimeCode = timeCodeFromSeconds(theInput);
+	totalStartMin = startFullTimeCode;
+	return totalStartMin;
+}
+
+function calculateEndMin()
+{
+	let theInput = secondsFromTimeCode(document.getElementById('endInput').value);
+	let endFullTimeCode = timeCodeFromSeconds(theInput);
+	totalEndMin = endFullTimeCode;
+	return totalEndMin;
+}
+                      //i
+function addRecord(theIdHere, totalStartMin, totalEndMin)
+{
+	let largestId = Math.max.apply(Math,records.map(function(o){return o.recordId;}));
+	let addingOneToLargestId = largestId + 1;
+
+	StartTimeEntered=secondsFromTimeCode(document.getElementById("startInput").value);
+	EndTimeEntered=secondsFromTimeCode(document.getElementById("endInput").value);
+
+	theTotalStartMinutes = calculateStartMin(totalStartMin);
+	theTotalEndMinutes = calculateEndMin(totalEndMin);
+
+	recordEntry =
+		{
+			//recordId: i,
+		  	recordId: addingOneToLargestId,
+			start: StartTimeEntered,
+			end: EndTimeEntered,
+			startMins: theTotalStartMinutes,
+			endMins: theTotalEndMinutes,
+			note: NotesEntered,
+			words: WordsEntered,
+			conclusion: ConclusionEntered
+		};
+
+	//idOfRecord = i;
+	idOfRecord = theIdHere;
+
+	records.push(recordEntry); //add item to end of array
+
+	console.log("records=" + JSON.stringify(records) + ";");
+	printRecords();
+
+	howManyRecords();
+}
+
+function printRecords()
+{
+	if(records.length == 0)
+	{
+		theHtmlAddRecordWithTable = "";
+
+		theHtmlAddRecordWithTable += '<body>';
+		document.getElementById('displayRecord').innerHTML = theHtmlAddRecordWithTable;
+	}
+
+	theHtmlAddRecordWithTable = "";
+
+	let optionNameForButtons = "";
+
+	theHtmlAddRecordWithTable += '<body>';
+
+	//theHtmlAddRecordWithTable += '<script src="playFunction.js"><\/script>';
+
+	for(i = 0; i < records.length; i++)
+	{
+		let videoId = "newVideoPlayer" + i;
+
+		console.log("Records Array Contains " + records.length + " Entries");
+
+		//play video button 100%
+		theHtmlAddRecordWithTable += '<table width="100%" class="mainTable" border="1"><tr><td width="65%"><center><button class="videoButtons" onclick="playVideoMAIN(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 1.0 )">&#x25b6; 100%</button>';
+
+		//play video button 50%
+		theHtmlAddRecordWithTable += '<button class="videoButtons" onclick="playVideoMAIN(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 0.5 )">&#x25b6; 50% </button>';
+
+		//play video button 25%
+		theHtmlAddRecordWithTable += '<button class="videoButtons" onclick="playVideoMAIN(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 0.25 )">&#x25b6; 25% </button><br>';
+
+		/*
+		//LOOP Video Button 100%
+		theHtmlAddRecordWithTable += '<button class="videoButtons" onclick="playVideoLoop(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 1.0 )">&#x25b6; 100% &#8644;</button>';
+
+		//loop video button 50%
+		theHtmlAddRecordWithTable += '<button class="videoButtons" onclick="playVideoLoop(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 0.5 )">&#x25b6; 50% &#8644;</button>';
+
+		//loop video button 25%
+		theHtmlAddRecordWithTable += '<button class="videoButtons" onclick="playVideoLoop(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 0.25 )">&#x25b6; 25% &#8644;</button><br>';
+*/
+
+		//Back 2 Seconds Button
+		theHtmlAddRecordWithTable += '<button class="videoButtons" onclick="back2Seconds(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 1.0 )">🢀F</button>';
+
+		//Back 2 Seconds Button
+		theHtmlAddRecordWithTable += '<button class="videoButtons" onclick="back2Seconds(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 0.5 )">🢀H</button>';
+
+		//Forward 2 Seconds Button
+		theHtmlAddRecordWithTable += '<button class="videoButtons" onclick="forward2Seconds(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 0.5 )">H🢂</button>';
+
+		//Forward 2 Seconds Button
+		theHtmlAddRecordWithTable += '<button class="videoButtons" onclick="forward2Seconds(' + records[i].start + ', ' + records[i].end + ', \''+videoId+'\', 1.0 )">F🢂</button>';
+
+  		//VIDEO of EACH ENTRY
+		theHtmlAddRecordWithTable += '<video class="videoLook" id=\''+videoId+'\' onloadstart="videoInit(\''+videoId+'\', '+ records[i].start + ', '+ records[i].end+')" width="800" controls><source src=\''+ nameOfVideo +'\' type="video/mp4">You Must Update to New Browser.</video> </td>';
+		//VIDEO of EACH ENTRY
+
+		theHtmlAddRecordWithTable += '<td width="35%"><div><font color="white"> </font></div>';
+
+		//Array Number - Record Number - Starts at 0
+		theHtmlAddRecordWithTable += '<br><div class="fontColor">#'+ i +' <br></div>';
+
+		//Start Time
+		theHtmlAddRecordWithTable += '<textarea id="'+i+'-startMins" rows="1" cols="20" class="startendtime" type="text" onchange="editThisRecord('+i+')"> '+records[i].startMins+' </textarea>';
+
+		//End Time
+  		theHtmlAddRecordWithTable += '<textarea id="'+i+'-endMins" rows="1" cols="20" class="startendtime" type="text" onchange="editThisRecord('+i+')"> '+records[i].endMins+' </textarea>';
+
+		//NOTES ENTERED BY USER
+		theHtmlAddRecordWithTable += '<textarea id="'+i+'-notes" rows="8" cols="50" class="myTextBoxNotes" type="text" onchange="editThisRecord('+i+')"> '+records[i].note+' </textarea>';
+
+		//WORDS SPOKEN, TYPED BY USER
+		theHtmlAddRecordWithTable += '<textarea id="'+i+'-words" rows="8" cols="50" class="myTextBoxWords" type="text" onchange="editThisRecord('+i+')"> '+records[i].words+' </textarea>';
+
+		//CONCLUSION ENTERED BY USER
+		theHtmlAddRecordWithTable += '<textarea id="'+i+'-conclusion" rows="8" cols="50" class="myTextBoxConclusion" type="text" onchange="editThisRecord('+i+')"> '+records[i].conclusion+' </textarea>';
+
+		theHtmlAddRecordWithTable += '<br><hr>';
+
+		//MOVE UP BUTTON
+		theHtmlAddRecordWithTable += '<button class="videoButtons" id=\''+i+'\' onclick="moveRecordUp('+i+')">UP</button>';
+
+		//MOVE DOWN BUTTON
+		theHtmlAddRecordWithTable += '<button class="videoButtons" id=\''+i+'\' onclick="moveRecordDown('+i+')">Down</button><br><hr>';
+
+		//DELETE THIS RECORD															="'+i+'-words"
+		theHtmlAddRecordWithTable += '<button class="videoButtons" id="'+i+'-deleteThis" onclick="deleteThisRecordButton('+i+')"> 🗑 Delete </button>';
+
+		//KEEP ONLY THIS RECORD BUTTON ⍝
+		theHtmlAddRecordWithTable += '<button class="videoButtons" id="'+i+'-keepOnlyThis" onclick="keepOnlyThisRecordButton('+i+')">Keep Only</button><br> ';
+
+		theHtmlAddRecordWithTable += '<hr>';	
+
+		theHtmlAddRecordWithTable += '</td></tr></table>';
+	}	
+		document.getElementById('displayRecord').innerHTML = theHtmlAddRecordWithTable;
+		howManyRecords();
+}
+
+function fullReportCode(theName)
+{
+	console.log("records=" + JSON.stringify(records, null, ' ') + ";" + "\n\n");
+}
+
+function fullReportFormatted()
+{
+	let reportText = "";
+	reportText += (
+	//"records=" + JSON.stringify(records, null) + ";" +
+	JSON.stringify(records) + ";");
+	return reportText;
+}
+
+function fullReportCodeNewWindow()
+{
+	let myTest = "";
+	let mytext = "";
+	mytext += ("records=" + JSON.stringify(records, null, ' ') + ";" + "\n\n");
+
+	let newWindow = window.open("","test","left=10 top=10 width=1200, height=600,scrollbars=1,resizable=1", true);
+
+    newWindow.document.open();
+    newWindow.document.write(mytext);
+    newWindow.document.close();
+}
+
+function reportSimple()
+{
+	//\''+videoId+'\'
+	var myText = "";
+	myText  += "records =[<br>{ ";
+	for(var i = 0; i < records.length; i++)
+    {
+	  myText += "<br>";
+      myText += "'recordId': " + "\''" + records[i].recordId + "'\',";
+	  myText += '<br>';
+	  myText += "'startMins': " + "\''" + records[i].startMins + "'\',";
+	  myText += '<br>';
+	  myText += "'endMins': " + "\''" + records[i].endMins + "'\',";
+	  myText += '<br>';
+	  myText += "'note': " + "\''" + records[i].note + "'\',";
+	  myText += '<br>';
+	  myText += "'words': " + "\''" + records[i].words + "'\',";
+	  myText += '<br>';
+	  myText += "'conclusion': " + "\''" + records[i].conclusion + "'\',";
+	  myText += '<br>},<br>{';
+
+	}
+    //jsonOutputDiv.innerHTML = output;
+
+	let newWindow = window.open("","test","left=10 top=10 width=1200, height=600,scrollbars=1,resizable=1", true);
+
+    newWindow.document.open();
+    newWindow.document.write(myText);
+    newWindow.document.close();
+}
+
+
+
+/*
+function myNewWindow()
+{
+	records = window.records;
+
+	let newWindow = window.open("","test","left=10 top=10 width=1200, height=600,scrollbars=1,resizable=1", true);
+
+	let text = "";
+	text += theHtmlAddRecordWithTable;
+
+    newWindow.document.open();
+    newWindow.document.write(text);
+    newWindow.document.close();
+}
+*/
+
+function pad(n, width, z)
+{
+	z = z || '0';
+ 	n = n + '';
+ 	return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+function padForCurrentTime(n, width, z)
+{
+	z = z || '0';
+ 	n = n + '';
+ 	return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+
+
+//The Up Arrow, for Start Time, for increasing the seconds
+function increaseItStart()
+{
+	let currentValue = secondsFromTimeCode(document.getElementById("startInput").value);
+	let addOneToValue = currentValue + 1;
+	let theValue = timeCodeFromSeconds(addOneToValue);
+
+	document.getElementById('theStartMinutes2').innerHTML = theValue;
+
+	document.getElementById('startInput').value = theValue;
+	//console.log("starttime is " + starttime);
+	StartTimeEntered = addOneToValue;
+	console.log("StartTimeEntered " + StartTimeEntered);
+
+	document.getElementById("continueButton").style.backgroundColor="rgb(0,250,250)";
+
+	document.getElementById("continueButton").innerText="press to continue";
+
+	return theValue;
+}
+
+//The Down Arrow, for Start Time, for decreasing the seconds
+function decreaseItStart()
+{
+	let currentValue = secondsFromTimeCode(document.getElementById("startInput").value);
+
+	let addOneToValue = currentValue - 1;
+	let theValue = timeCodeFromSeconds(addOneToValue);
+
+	document.getElementById('theStartMinutes2').innerHTML = theValue;
+
+	document.getElementById('startInput').value = theValue;
+	StartTimeEntered = addOneToValue;
+	console.log("StartTimeEntered " + StartTimeEntered);
+
+	document.getElementById("continueButton").style.backgroundColor="rgb(0,250,250)";
+
+	document.getElementById("continueButton").innerText="press to continue";
+
+	return theValue;
+}
+
+function increaseItEnd()
+{
+	let currentValue = secondsFromTimeCode(document.getElementById("endInput").value);
+
+	let addOneToValue = currentValue + 1;
+	let theValue = timeCodeFromSeconds(addOneToValue);
+
+	document.getElementById('theEndMinutes2').innerHTML = theValue;
+
+	document.getElementById('endInput').value = theValue;
+	EndTimeEntered = addOneToValue;
+	console.log("EndTimeEntered " + EndTimeEntered);
+
+	document.getElementById("continueButton").style.backgroundColor="rgb(0,250,250)";
+
+	document.getElementById("continueButton").innerText="press to continue";
+
+	return theValue;
+}
+
+function decreaseItEnd()
+{
+	let currentValue = secondsFromTimeCode(document.getElementById("endInput").value);
+
+	let addOneToValue = currentValue - 1;
+	let theValue = timeCodeFromSeconds(addOneToValue);
+
+	document.getElementById('theEndMinutes2').innerHTML = theValue;
+
+	document.getElementById('endInput').value = theValue;
+	EndTimeEntered = addOneToValue;
+	console.log("EndTimeEntered " + EndTimeEntered);
+
+	document.getElementById("continueButton").style.backgroundColor="rgb(0,250,250)";
+
+	document.getElementById("continueButton").innerText="press to continue";
+
+	return theValue;
+}
+
+function setStartTime()
+{
+	StartTimeEntered = secondsFromTimeCode(document.getElementById("startInput").value);
+	let startFullTimeCode = timeCodeFromSeconds(StartTimeEntered);
+
+	//Display it on the bottom
+	document.getElementById('theStartMinutes2').innerHTML = startFullTimeCode;
+
+	document.getElementById("continueButton").style.backgroundColor="rgb(0,250,250)";
+
+document.getElementById("continueButton").innerText="press to continue";
+	
+}
+
+//when user types input of end seconds, or button
+function setEndTime()
+{
+	EndTimeEntered = secondsFromTimeCode(document.getElementById("endInput").value);
+	let endFullTimeCode = timeCodeFromSeconds(EndTimeEntered);
+
+	// <!-- Display it on the right side -->
+	//document.getElementById('theEndMinutes').innerHTML = endFullTimeCode;
+
+	//Display it on the bottom
+	document.getElementById('theEndMinutes2').innerHTML = endFullTimeCode;
+
+	document.getElementById("continueButton").style.backgroundColor="rgb(0,250,250)";
+
+	document.getElementById("continueButton").innerText="press to continue";
+}
+
+function setVolume(volumeValue){
+	video1.volume = volumeValue;
+}
+
+function setVideoSize(videoSize){
+	video1.width = videoSize;
+}
+
+function timeCodeFromSeconds(seconds) {
+	seconds = parseInt(seconds);
+	//seconds = seconds < 0 ? 0 : seconds;
+
+	if(seconds < 0)
+	{
+		seconds = 0;
+	}
+	else
+	{
+		seconds = seconds;
+	}
+
+	//this is inline if, if seconds is below zero,
+	//give seconds 0 value, otherwise previous value is ok
+
+	//seconds = parseInt(seconds);
+	let Zminutes = Math.floor(seconds / 60);
+  	Zminutes = Zminutes % 60;
+  	Zminutes = pad(Zminutes, 2);
+  	let Zhours = Math.floor(seconds / 3600);
+  	Zhours = pad(Zhours, 2);
+  	let Zseconds = Math.floor(seconds % 60);
+  	Zseconds = pad(Zseconds, 2);
+  	let fullTimeCode = Zhours + ":" + Zminutes + ":" + Zseconds;
+  	return fullTimeCode;
+}
+
+function secondsFromTimeCode(fullTimeCode)
+{
+	if(!fullTimeCode) fullTimeCode = '00:00:00';
+	let theStringSeconds = fullTimeCode;
+	let splitValue = theStringSeconds.split(":");
+
+	let secondsOnly = parseInt(splitValue[2]);
+	let secondsFromMinutes = parseInt(splitValue[1]) * 60;
+	let secondsFromHours = parseInt(splitValue[0]) * 3600;
+
+	let calculatedSeconds = secondsFromHours + secondsFromMinutes + secondsOnly;
+	//now seconds variable is an array, 1:2:3
+
+	return calculatedSeconds;
+}
+
+function markStartVideo()
+{
+	let video = document.getElementById("video1");
+	let markStart = video.currentTime;
+	let startFullTimeCode = timeCodeFromSeconds(markStart);
+
+	document.getElementById('theStartMinutes2').innerHTML = startFullTimeCode;
+
+	//display markStart in the startInput text box
+	secondsFromTimeCode(document.getElementById("startInput").value = startFullTimeCode);
+
+	console.log(markStart);
+
+	StartTimeEntered = markStart;
+
+	document.getElementById("continueButton").style.backgroundColor="rgb(0,250,250)";
+
+	document.getElementById("continueButton").innerText="press to continue";
+}
+
+function markEndVideo()
+{
+	let video = document.getElementById("video1");
+	let markEnd = video.currentTime;
+	let endFullTimeCode = timeCodeFromSeconds(markEnd);
+
+	document.getElementById('theEndMinutes2').innerHTML = endFullTimeCode;
+
+	//display markStart in the startInput text box
+	secondsFromTimeCode(document.getElementById("endInput").value = endFullTimeCode);
+
+	console.log(markEnd);
+
+	EndTimeEntered = markEnd;
+
+	document.getElementById("continueButton").style.backgroundColor="rgb(0,250,250)";
+
+	document.getElementById("continueButton").innerText="press to continue";
+
+	return markEnd;
+}
+
+function back2Seconds(starttime, endtime, elementId, ourPlayBack)
+{
+	video = document.getElementById(elementId); //handler should be bound first
+	StartTimeEntered = video.currentTime;
+	EndTimeEntered = endtime;
+	  video.addEventListener("timeupdate",function()
+	  {
+		if (this.currentTime >= EndTimeEntered)
+		{
+      		this.pause();
+    	}
+	  }, false);
+
+	video.playbackRate = ourPlayBack;
+	video.play();
+
+	try
+	{
+		video.currentTime -= 2;
+	}
+	catch (ex) 
+	{
+      //handle exceptions here
+  	}
+}
+
+function forward2Seconds(starttime, endtime, elementId, ourPlayBack)
+{
+	video = document.getElementById(elementId); //handler bound
+	StartTimeEntered = video.currentTime;
+	EndTimeEntered = endtime;
+	  video.addEventListener("timeupdate",function()
+	  {
+		if (this.currentTime >= EndTimeEntered)
+		{
+      		this.pause();
+    	}
+  	  }, false);
+	video.playbackRate = ourPlayBack;
+  	video.play();
+	try
+	{
+		video.currentTime += 2;
+	} 
+	catch (ex) 
+	{
+    	//handle exceptions here
+  	}
+}
+
+function videoInit(whichVideoToUse, theStart, theEnd)
+{
+	let video = document.getElementById(whichVideoToUse);
+	//videoShouldLoop = true;
+
+  	video.currentTime = theStart;
+	//console.log(theStart);
+}
+
+function playVideoMAIN(starttime, endtime, elementId, ourPlayBack)
+{
+	video = document.getElementById(elementId);
+	//handler should be bound first
+	
+	EndTimeEntered = endtime;
+	
+    video.addEventListener("timeupdate",function(){
+	   if (this.currentTime >= EndTimeEntered) 
+	   {
+            this.pause();
+       }
+    }, false);
+
+	video.playbackRate = ourPlayBack;
+    video.play();    
+		
+	//try, is for, if error, don't break script, go to catch code
+    try {  
+        video.currentTime = starttime;
+    } catch (ex) {
+        //handle exceptions here
+	}
+}
+</script>
+
+<style>
+.mainTable
+{
+	border-color: blue;
+}
+
+.skipColor  /* skip 2 back and forward buttons */
+{
+	background-color: rgb(170, 240, 240);
+}
+
+.playColor  /* play buttons, 100, 50, 25, */
+{
+	background-color: rgb(107, 191, 247); /*  */
+}
+
+.flexRow
+{
+	display:flex;
+	flex-direction: row;
+	flex-basis: auto;
+	flex-wrap: nowrap;  /*makes it fit on the screen width */
+	justify-content: center;
+}
+
+.flexRowMedium    /*flex for notes words conclusion */
+{
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 1000px;
+	text-align: center;
+	background: #fff;
+	border-bottom: 1px solid #ccc;
+	border-radius: 6px;
+	display:flex;
+	flex-basis:auto;
+	flex-direction: row;
+	justify-content:space-around;
+}
+
+.flexColumn  /*display notes words conclusion timecode */
+{
+	display:flex;
+	flex-direction: column;
+	flex-basis: auto;
+	flex-wrap: wrap;
+	justify-content: center;
+	text-align: center;
+}
+
+body {
+/* background-image: url('bg_grid.png'); */
+background-color:#143642;
+width: 1200px;
+margin: 0 auto;
+
+}
+
+*{
+	font-family: Verdana, sans-serif;;  /*Bevan,serif; Arial*/
+	font-weight: normal;
+}
+
+
+.fontColorBigger {
+	color: rgb(255,255,255);
+	font-size:32px;
+}
+
+.startendtime {
+	height:26px;
+	width: 110px;
+	border-radius:6px;
+	border:3px solid #145075;
+	display:inline-block;
+	cursor:pointer;
+	color:black;
+	font-size:15px;
+	text-decoration:none;
+	text-shadow:0px -1px 0px #5b6178;
+}
+
+.startendtime:hover {
+	/* background:linear-gradient(to bottom, #011117 1%, #019ad2 50%); */
+	color: black;
+}
+
+.startendtime:visited {
+	color:black;
+}
+
+.startendtime:active {
+	color:black;
+}
+
+.startendtime:focus {
+	background: rgb(210,230,230);
+	color:black;
+}
+
+.timeCode {
+	/* color: rgb(0,255,0); */
+	color: rgb(0,220,220);
+	font-size:18px;
+}
+
+.fontColor {
+	color: rgb(255,255,255);
+	font-size:21px;
+}
+
+
+.note {
+  /* color: rgb(255,255,0); */
+	color: white;
+	font-size:21px;
+}
+
+.words {
+	color: white;
+	font-size:21px;
+}
+
+.conclusion {
+	color: white;
+	font-size:21px;
+}
+
+.videoLook {
+	border:0px solid;
+	border-color: white;
+	/* width: 900px; */
+}
+
+.videoNameDisplayed {
+	color: gray;
+	font-size:16px;
+}
+
+.titleBig {
+	padding-left: 40px;
+  	color: rgb(255,255,255);
+	font-size:27px;
+}
+
+.videoButtonsTEXT {
+	text-align:center;
+	width: 100px;
+	/* height:25px; */
+	border-radius:5px;
+  	display: inline-block; /*fits button to text */
+	border:3px solid #145075;
+	cursor:pointer;
+	color:black;
+	font-size:15px;
+	padding: 0px 0px;
+}
+
+
+/*
+.videoButtons {
+	text-align:center;
+	border-radius:5px;
+  	display: inline-block;
+	border:3px solid #145075;
+	cursor:pointer;
+	color:black;
+	font-size:15px;
+	padding: 0px 5px;
+}
+*/
+
+/*
+.videoButtons:hover {
+	background: rgb(255, 255, 255);
+	color: black;
+}
+
+.videoButtons:visited {
+	top:1px;
+	color:black;
+}
+
+.videoButtons:active {
+	top:1px;
+	color:black;
+}
+
+.videoButtons:focus {
+	top:1px;
+	color:black;
+}
+*/
+
+.videoButtons {
+	font-weight:bold;
+	text-decoration:none;
+	font-family:Arial;
+	box-shadow:inset #595959 0px 5px 8px -1px,#000000 0px 4px 6px;
+	o-box-shadow:inset #595959 0px 5px 8px -1px,#000000 0px 4px 6px;
+	-moz-box-shadow:inset #595959 0px 5px 8px -1px,#000000 0px 4px 6px;
+	-webkit-box-shadow:inset #595959 0px 5px 8px -1px,#000000 0px 4px 6px;
+	background:#787878;
+	background:-o-linear-gradient(90deg, #787878, #454545);
+	background:-moz-linear-gradient( center top, #787878 5%, #454545 100% );
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #787878), color-stop(1, #454545) );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#787878', endColorstr='#454545');
+	background:-webkit-linear-gradient(#787878, #454545);
+	background:-ms-linear-gradient(#787878, #454545);
+	background:linear-gradient(#787878, #454545);
+	text-indent:0px;
+	line-height:0px;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	text-align:center;
+	vertical-align:middle;
+	display:inline-block;
+	font-size:14.5px;
+	color:#f7f7f7;
+	margin:1px;
+	padding:9px;
+	border-color:#2e2e2e;
+	border-width:1px;
+	border-style:solid;
+}
+
+.videoButtons:active {
+	box-shadow:inset #595959 0px 1px 1px -1px,#a6a6a6 0px 0 3px;
+	o-box-shadow:inset #595959 0px 1px 1px -1px,#a6a6a6 0px 0 3px;
+	-moz-box-shadow:inset #595959 0px 1px 1px -1px,#a6a6a6 0px 0 3px;
+	-webkit-box-shadow:inset #595959 0px 1px 1px -1px,#a6a6a6 0px 0 3px;
+	position:relative;
+	top:2px;
+	border-color:#ffffff;
+}
+
+.videoButtons:hover {
+	background:#000000;
+	background:linear-gradient(#454545, #000000);
+}
+
+
+.myVideoButtonSmaller{
+	width: 150px;
+	align-content: flex-end;
+}
+
+.myButton {
+	height:25px;
+	background-color: white;
+	 border-radius:2px;
+	/* border:3px solid #145075; */
+	/* display:inline-block; */
+	cursor:pointer;
+	color:black;
+	font-size:16px;
+}
+
+.myButton:hover {
+	/* background:linear-gradient(to bottom, #011117 1%, #019ad2 50%);  */
+	background: rgb(210,230,230);
+	color: black;
+}
+
+.myButton:visited {
+	top:1px;
+	color:black;
+}
+
+.myButton:active {
+	top:1px;
+	color:black;
+}
+
+.myButton:focus {
+	top:1px;
+	color:black;
+}
+
+.myButtonSmaller {
+	font-size:12px;
+	height: 25px;
+	 padding-right:10px; */
+	/* margin:0px; */
+	width: 30px;
+}
+
+.myButtonMedium {
+	font-size: 15px;
+}
+
+.myTextBox2 {
+	text-align: center;
+	width:60px;
+	height: 14px;
+	border-radius:6px;
+	border:2px solid #92beda;
+	display:inline-block;
+	cursor:pointer;
+	color:black;
+	font-size:16px;
+	padding:2px 7px;
+	text-decoration:none;
+	/* text-shadow:0px -1px 0px #5b6178; makes it bolder */
+}
+
+.myTextBox2:hover {
+	background:linear-gradient(to bottom, #011117 5%, #1c6f8d 50%);
+	background-color:#019ad2;
+	color: white;
+}
+
+.myTextBox2:active {
+	position:relative;
+	top:1px;
+}
+
+.inputTimeCode {
+	text-align: center;
+	width:105px;
+	height: 22px;
+	border-radius:6px;
+	border:2px solid #145075;
+	display:inline-block;
+	cursor:pointer;
+	color:black;
+	font-weight: bold;
+	font-size:18px;
+	/* padding:10px 10px; */
+	text-decoration:none;
+	/* text-shadow:0px -1px 0px #5b6178; makes it bolder */
+}
+
+.inputTimeCode:focus{
+	background: rgb(210,230,230);
+}
+
+.notesWordsConclusionSection{
+	text-align: center;
+}
+
+.mainNotesWordsConclusion
+{
+	height:100px;
+	width:33%;
+	box-sizing: border-box;
+	background-color: rgb(240,240,240);
+	border-radius:6px;
+	border:3px solid rgb(0,0,0);
+	border-color: black;
+	cursor:pointer;
+	color:black;
+	font-size:14px;
+	padding:9px 9px;
+	text-decoration:none;
+}
+
+.mainNotesWordsConclusion:hover {
+	border-color:blue;
+	background-color: rgb(210,230,230);
+}
+
+.mainNotesWordsConclusion:active {
+	 position:relative;
+	 top:1px;
+}
+
+.myTextBoxNotes {
+	/* background-image: url('bg_grid.png'); */
+	height:100px;
+	width:70%;
+	box-sizing: border-box;
+	background-color: rgb(255,255,255);
+	border-radius:6px;
+	border:2px solid #145075;
+	border-color: black;
+	cursor:pointer;
+	color:black;
+	font-size:14px;
+	padding:9px 9px;
+	text-decoration:none;
+}
+
+.myTextBoxNotes:hover {
+	border-color:blue;
+	background-color: rgb(210,230,230);
+}
+
+.myTextBoxNotes:active {
+	 position:relative;
+	 top:1px;
+}
+
+.myTextBoxWords {
+	height: 100px;
+	width:70%;
+	box-sizing: border-box;
+	background-color: rgb(255,255,255);
+	border-radius:6px;
+	border:2px solid #145075;
+	border-color: black;
+	cursor:pointer;
+	color:black;
+	font-size:14px;
+	padding:9px 9px;
+	text-decoration:none;
+}
+
+.myTextBoxWords:hover {
+	border-color:blue;
+	background-color: rgb(210,230,230);
+}
+
+.myTextBoxWords:active {
+	position:relative;
+	top:1px;
+}
+
+.myTextBoxConclusion {
+	height: 100px;
+	width:70%;
+	box-sizing: border-box;
+	background-color: rgb(255,255,255);
+	border-radius:6px;
+	border:2px solid #145075;
+	border-color:black;
+	cursor:pointer;
+	color:black;
+	font-size:14px;
+	padding:9px 9px;
+	text-decoration:none;
+}
+
+.myTextBoxConclusion:hover {
+	border-color:blue;
+	background-color: rgb(210,230,230);
+}
+
+.myTextBoxConclusion:active {
+	position:relative;
+	top:1px;
+}
+
+.myButtonTIMECODE {
+	height:30px;
+	width:60px;
+	background: white;
+	border-radius:6px;
+	border:3px solid #145075;
+	display:inline-block;
+	cursor:pointer;
+	color:black;
+	font-size:19px;
+	text-decoration:none;
+	text-shadow:0px -1px 0px #5b6178;
+}
+
+.myButtonTIMECODE:hover {
+	 /* background:linear-gradient(to bottom, #011117 1%, #019ad2 50%); */
+}
+
+.myButtonTIMECODE:visited {
+	top:1px;
+}
+
+.myButtonTIMECODE:active {
+	top:1px;
+}
+
+.myButtonTIMECODE:focus {
+	top:1px;
+}
+
+.displayNote {
+		color: white;
+		font-size:18px;
+		text-align: center;
+	}
+
+.displayWords {
+		color: white;
+		font-size:18px;
+		text-align: center;
+}
+
+.displayConclusion {
+		color: white;
+		font-size:18px;
+		text-align: center;
+}
+
+.currentTime {
+	color: rgb(0,230,255);
+	font-size:18px;
+}
+	
+/*
+details {
+  margin: 1rem;
+  padding: 0 1rem;
+  width: 17em;
+  border: 1px solid rgb(166, 203, 221);
+  border-radius: 6px;
+  background-color: rgb(0, 0, 0);
+  color: #263238;
+  transition: background-color .15s;
+}
+*/
+
+summary::marker{
+	color:white;
+}
+</style>
+
+</head>
+
+<body id="bodySection" onload="loadFunctions();">
+<hr>
+
+<div id="flexVolumeAndWindowSize" class="flexRow">
+	<!-- onclick="continueVideo('video1')" -->
+	<button id="continueButton" class="videoButtons" label title="Continue Video During Isolation Mode"> Plays to End </button>
+</div>
+
+<div id="videoControlButtons" class="flexRow" align="center">
+	<!-- back2Seconds(StartTimeEntered, EndTimeEntered, 'video1', 1.0 )" -->
+	<button id="back2SecondsButton100" class="videoButtons skipColor" label title="Skip Back 2 Seconds Full Speed"> 🢀 100%</button>
+
+	<!-- back2Seconds(StartTimeEntered, EndTimeEntered, 'video1', 0.5 )" -->
+	<button id="back2SecondsButton50" class="videoButtons skipColor" label title="Skip Back 2 Seconds Half Speed"> 🢀 50%</button>
+&nbsp &nbsp
+	<!-- playVideo(StartTimeEntered, EndTimeEntered, 'video1', 1.0 )" -->
+	<button id="playVideo100Button" class="videoButtons playColor" label title="Play Normal Speed"> &#x25b6; 100%</button>
+
+	<!-- playVideo(StartTimeEntered, EndTimeEntered, 'video1', 0.5 )" -->
+	<button id="playVideo50Button" class="videoButtons playColor" label title="Play Half Speed"> &#x25b6; 50%</button>
+
+	<!-- playVideo(StartTimeEntered, EndTimeEntered, 'video1', 0.25 )" -->
+	<button id="playVideo25Button" class="videoButtons playColor" label title="Play Quarter Speed"> &#x25b6; 25%</button>
+&nbsp &nbsp
+	<!--forward2Seconds(StartTimeEntered, EndTimeEntered, 'video1', 0.5 )" -->
+	<button id="forward2SecondsButton50" class="videoButtons skipColor"  label title="Skip Forward 2 Seconds Half Speed"> 🢂 50% </button>
+
+	<!--forward2Seconds(StartTimeEntered, EndTimeEntered, 'video1', 1.0 )" -->
+    <button id="forward2SecondsButton100" class="videoButtons skipColor" label title="Skip Forward 2 Seconds Full Speed"> 🢂 100% </button>
+</div>
+
+<div id="flexRow"  align="center">
+	<!-- decreaseItStart()"  -->
+	<button class="videoButtons" id="decreaseItStartButton">&#x25BC;</button>
+
+	<!--onclick="increaseItStart()"  -->
+	<button class="videoButtons" id="increaseItStartButton">&#x25B2;</button>
+
+	<!-- onchange="setStartTime()"-->
+	<input id="startInput" class="videoButtonsTEXT" type="text">
+
+    <button class="videoButtons" id="markStartVideoButton" label title="Mark Start of Video"> 🕑Start</button>
+<br>
+		<!-- onclick="decreaseItEnd()" -->
+	<button class="videoButtons" id="decreaseItEndButton">&#x25BC;</button>
+
+	<!-- onclick="increaseItEnd()"  -->
+	<button class="videoButtons" id="increaseItEndButton">&#x25B2;</button>
+
+	<!--  onchange="setEndTime()" -->
+	<input id="endInput" class="videoButtonsTEXT" type="text">
+
+	<!-- onclick="markEndVideo('video1')"  -->
+	<button class="videoButtons" id="markEndVideoButton" label title="Mark End of Video">&nbsp End🕔 </button>
+</div>
+
+<div class="flexRow">
+	<!--VIDEO PLAYER ON SCREEN-->
+	<video class="videoLook" id="video1" controls>
+	<source src="movie.mp4" type="video/mp4">
+		You Must Update to New Browser.
+	</video>
+</div>
+
+<div id="flexVolumeAndWindowSize" class="flexRow">
+	<!-- onclick="continueVideo('video1')" -->
+	<!-- <button id="continueButton" class="videoButtons" label title="Continue Video During Isolation Mode"> Plays to End </button> -->
+<details>
+	<summary><font color="white">SIZE</font></summary>
+	<font class="fontColor"> &#9032; </font>
+	<!--XL, LARGE, MEDIUM, SMALL, BUTTONS-->
+	<button class="videoButtons" id="xxlSIZEButton">XXL</button>
+	<button class="videoButtons" id="xlSIZEButton">XL</button>
+	<button class="videoButtons" id="lSIZEButton">L</button>
+	<button class="videoButtons" id="mSIZEButton">M</button>
+	<button class="videoButtons" id="sSIZEButton">S</button>
+</details>
+&nbsp &nbsp
+<details>
+	<summary><font color="white">VOLUME</font></summary>
+	<!-- &#x1f50a; with sound waves -->
+	<font class="fontColor"> &#x1f50a; </font>
+	<button id="volume100Button" class="videoButtons"> 100 </button>
+	<button id="volume50Button" class="videoButtons"> 50 </button>
+	<button id="volume25Button" class="videoButtons"> 25 </button>
+	<button id="volume15Button" class="videoButtons"> 15 </button>
+	<button id="volume5Button" class="videoButtons"> 5 </button>
+	<button id="volume0Button" class="videoButtons"> &#x1f507; </button>
+</div>
+</details>
+
+
+<div id="notesWordsConclusionSection" class="flexRowMedium">
+	<!-- NOTES ABOUT THE SEGMENT -->
+	<!-- onchange="setNote()" onload="clearText()"-->
+	<textarea id="noteInput" placeholder="Write Notes" rows="4" cols="50" class="mainNotesWordsConclusion" type="text"></textarea>
+
+	<!-- WORDS SAID in VIDEO -->
+	<!-- onchange="setWords()" onload="clearText()" -->
+	<textarea id="wordsInput" placeholder="Write Words Spoken" rows="4" cols="50" class="mainNotesWordsConclusion" type="text"></textarea>
+
+	<!-- CONCLUSION ABOUT THE SEGEMENT -->
+	<!-- onchange="setConclusion()" onload="clearText()" -->
+	<textarea id="conclusionInput" placeholder="Write Conclusion" rows="4" cols="50" class="mainNotesWordsConclusion" type="text"></textarea>
+</div>
+
+
+<div class="flexColumn">
+	<!-- onclick="clearText()" -->
+	<input type="button" class="videoButtons myVideoButtonSmaller" id="clearTextButton" value="Clear All Text ⌦"></button>
+
+	<!--Hours and Minutes and Seconds-->
+	<div class="timeCode" id="theStartMinutes2">00:00:00</div>
+	<div class="timeCode" id="theEndMinutes2">00:00:00</div>
+
+	<!-- the output of what is written in the text area of notes, words, conclusion -->
+	<div class="displayNote" id="displayNote">Note Info</div>
+	<div class="displayWords" id="displayWords">Words Said </div>
+	<div class="displayConclusion" id="displayConclusion">Conclusion</div>
+
+	<!-- Add Record Button -->
+	<!-- onclick="addRecord() -->
+	<div class="addRecordButtonContainer">
+	<button id="addRecordButton" class="videoButtons" value="ADD RECORD">
+			Add Record Ѫ
+	</button>
+	<b class="fontColorBigger" id="displayCount" align="left"></b>
+</div>
+
+</center>
+<div><br></div>
+
+
+<div class="titleBig" align="left">
+	<!-- jsonDownload(records)" value="download"> -->
+	<button id="jsonDownloadButton" class="videoButtons" value="download">
+	⎙ Download Records
+	</button>
+
+	<a id="downloadAnchorElem" style="display:none"></a>
+			
+	<input class="videoButtons" id="simpleReport" type="button" value="Report Simplified" onclick="reportSimple()">
+
+	<!-- onclick="fullReportCodeNewWindow()" -->
+	<input type="button" class="videoButtons" id="fullReportNewWindowButton" value="REPORT CODE to NEW WINDOW">
+	
+	<!-- onclick="fullReportCode()" -->
+	<input class="videoButtons" id="fullReportCodeButton" type="button" value="REPORT CODE to Console Press F12" onclick="fullReportCode()">
+				
+	<input class="videoButtons" id="clearAllRecordsButton" type="button" value="Clear All Records">
+<br>
+    <input id="deleteRecordInput" class="myTextBox2" type="text">
+	<!-- onclick="deleteThisRecord()" -->
+    <input class="videoButtons" id="deleteThisRecordButton" type="button" value="Record # to Delete">
+	<div class="note" id="displayDeletedRecord"></div>
+			
+	<!-- onclick="showReverseOrder()" -->
+	<input class="videoButtons" id="showReverseOrderButton" type="button" value="Reverse Record Order">	
+</div>
+
+  <!-- DISPLAYS THE ENTRIES -->
+	<div id="displayRecord"></div>
+
+</body>
+</html>
