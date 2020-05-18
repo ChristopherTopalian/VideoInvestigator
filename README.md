@@ -1,5 +1,5 @@
 # VideoInvestigator
-100% Pure JS Video Annotation Database Software that is designed to make studying any Video very easy. You create a Video Database that you can Save as a simple light-weight Text File.
+100% Pure JS Video Annotation Database Software that is designed to make studying any Video very easy. You create a Video Database that you can Save as a simple light-weight Text File. The Vi Book can be found here: https://www.amazon.com/dp/B088PZ64V9
 
 Our Innovative Light-weight Video Annotation Database Program allows anyone to quickly and efficiently organize video content into start and end points with detailed information for each section added.
 
