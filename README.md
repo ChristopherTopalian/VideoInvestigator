@@ -49,23 +49,4 @@ When you First Open VideoInvestigator.html
 3. Review the report, then press ADD RECORD button.
 4. Scroll down to the bottom to see the new entry that you just added.
 
-
-Summary:
-Our Innovative Light-weight Video Annotation Database Program allows anyone to quickly and efficiently organize video content into start and end points with detailed information for each section added. 
-
-Instead of Exporting Videos, which would create huge file sizes, we instead generate Javascript Objects, of each entry. This way, even when we create 100 of entries, our file size is still usually lower than 100 kilobytes. 
-
-VideoInvestigator was originally designed with Law Enforcement Detectives and Deception Detection Specialists needs in mind. This light-weight video database program allows anyone, from any field of study, to take any video and fully organize it, from top to bottom. 
-
-Video Database
-With the Download Records Button, we easily create a Records File, of our video annotation markup information.
-In other words, we create a Databse of Entries, that we create, which consist of start and end times of the video with text descriptions for each section that we make.
-
-Easily Save Your Work
-It is very easy to save your progress with just one click. We press the Download Records button to save our work to a file. This is designed with speed in mind and containment.
-This method generates a very small file size, usually less than 100 kilobytes. Because of this, hours and hours of video annotation is very easy to accomplish with this app.
-
-Light-Weight
-By utilizing Javascript Objects, we are able to have full control and total flexibility in create our Video Database of entries. Designed to be light-weight, in order to be able to display hundreds of entres on one page, our innovative system allows a person the ability to SEE the project as a whole, with a simple scroll of the mouse wheel.
-
-
+For full instructions please see the Manual included as a PDF file.
